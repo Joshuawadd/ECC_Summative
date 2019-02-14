@@ -1,3 +1,4 @@
+import numpy as np
 def message(a):
     l = len(a)
     rfound = False
@@ -16,16 +17,94 @@ def message(a):
     return m
 
 def hammingEncoder(m):
-    return []
+    r=2
+    rfound = False
+    while rfound == False:
+        k = 2**r - r - 1
+        if k > len(m) :
+            rfound = True
+            return []
+        elif k == len(m):
+            rfound = True
+        else:
+            r+=1
+    g = hammingGeneratorMatrix(r)
+    n = (np.matmul(m,g)%2).tolist()   
+    return n
 
 def hammingDecoder(v):
-    return []
+    k = len(v)
+    r=2
+    rfound = False
+    while rfound == False:
+        if k == 2**r - 1 :
+            rfound = True
+        elif k < 2**r - 1:
+            return []
+        else:
+            r+=1
+    HT =[]
+    for i in range(1, 2**r):
+        HT.append(decimalToVector(i,r))
+    vHT = (np.matmul(v,HT)%2).tolist()
+    j = len(vHT)-1
+    i=0
+    for num in vHT:
+        if num == 1:
+            i = i + 2**j
+        j=j-1
+    if i != 0:        
+        if v[i-1] == 1:
+            v[i-1] = 0
+        else:
+            v[i-1] = 1
+    return v
 
 def messageFromCodeword(c):
-    return []
+    k = len(c)
+    r=2
+    rfound = False
+    while rfound == False:
+        if k == 2**r - 1 :
+            rfound = True
+        elif k < 2**r - 1:
+            return []
+        else:
+            r+=1
+    m = []
+    positions = []
+    for i in range(0,r):
+        positions.append(2**i-1)
+    j=0
+    for i in range(0,len(c)):
+        if i not in positions:
+            m.append(c[i])
+    return m
 
 def dataFromMessage(m):
-    return []
+    k = len(m)
+    r=2
+    rfound = False
+    while rfound == False:
+        if k == 2**r - r - 1 :
+            rfound = True
+        elif k < 2**r - r - 1:
+            return []
+        else:
+            r+=1
+    b=1
+    l=0
+    for i in range (r-1,-1,-1):
+        if m[i] == 1:
+            l+=b
+        b*=2
+    v=[]
+    if l > len(m)-r:
+        return[]
+    else :
+        for i in range (r,r+l):
+            v.append(m[i])
+    return v
 
 def repetitionEncoder(m,n):
     c = []
